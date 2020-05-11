@@ -266,8 +266,8 @@ def download(feedID, options):
                 pprint.pprint(response)
         except IndexError:
             if 'entities' not in response:
-                print("E) No entities in response!")
                 if options.verbose:
+                    print("E) No entities in response!")
                     pprint.pprint(response)
             else:
                 return response['entities']
