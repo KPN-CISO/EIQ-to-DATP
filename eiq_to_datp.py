@@ -256,17 +256,22 @@ def download(feedID, options):
     else:
         if options.verbose:
             print("U) Attempting to download latest feed content ...")
-        content_block = response['data']['content_blocks'][0]
-        content_block = content_block.replace(settings.EIQVERSION, "")
-        response = eiqAPI.do_call(endpt=content_block,
-                                  headers=eiqHeaders,
-                                  method='GET')
-        if options.verbose:
-            pprint.pprint(response)
-        if 'entities' not in response:
-            print("E) No entities in response!")
-        else:
-            return response['entities']
+        try:
+            content_block = response['data']['content_blocks'][0]
+            content_block = content_block.replace(settings.EIQVERSION, "")
+            response = eiqAPI.do_call(endpt=content_block,
+                                      headers=eiqHeaders,
+                                      method='GET')
+            if options.verbose:
+                pprint.pprint(response)
+        except IndexError:
+            if 'entities' not in response:
+                print("E) No entities in response!")
+                if options.verbose:
+                    pprint.pprint(response)
+            else:
+                return response['entities']
+
 
 
 if __name__ == "__main__":
