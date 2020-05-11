@@ -1,0 +1,57 @@
+"""
+Sample settings
+"""
+
+# Global Settings
+
+# TENANTID              [Required] Microsoft Tenant ID
+# EXPIRY                [Required] Number of days to keep Indicator in MSSC
+
+TENANTID = '<your-tenant-id-here>'
+EXPIRY = 30
+
+# Settings for Microsoft Security Center API
+#
+# MSSCAPIURL            [Required] 'https://api.securitycenter.windows.com/api/indicators'
+# MSSCCLIENTID          [Required] replace with your client ID
+# MSSCCLIENTSECRET      [Required] replace with your client secret
+# MSSCRESOURCEAPPIDURI  [Required] AppID URL - usually the URL for a Security Center alerts
+#                                  API: 'https://api.securitycenter.windows.com'
+# MSSCSSLVERIFY         [Required] Verify the SSL connection (default: yes)
+
+MSSCTOKENURI = 'https://login.microsoftonline.com/%s/oauth2/token' % (TENANTID)
+MSSCAPIURL = 'https://api.securitycenter.windows.com/api/indicators'
+MSSCCLIENTID = '<your-client-ID-here>'
+MSSCCLIENTSECRET = '<your-client-secret-here>'
+MSSCRESOURCEAPPIDURI = 'https://api.securitycenter.windows.com'
+MSSCSSLVERIFY = True
+
+# Settings for EclecticIQ
+
+# EIQHOST               [Required] EIQ URL, e.g.: 'https://myeiq.localdomain'.
+# EIQFEEDS              [Required] EIQ Feed Path, normally: '/open-outgoing-feed-download'
+# EIQVERSION            [Required] Pick '/api' as the EIQVERSION for EIQ <=2.0.x,
+#                                  or '/private' for EIQ 2.1.x+
+# EIQUSER               [Required] EIQ username for automation purposes
+# EIQPASS               [Required] EIQ password for automation purposes
+# EIQSOURCE             [Required] EIQ 'source' UUID for automation purposes. One username
+#                                   can have multiple sources where it can 'ingest data'
+#                                   from. This 'source' can be found through the EIQ
+#                                   webinterface and JSON calls.
+# EIQSSLVERIFY          [Required] Verify the SSL connection to EIQ (default: yes)
+
+EIQHOST = 'https://myeiq.localdomain'
+EIQFEEDS = '/open-outgoing-feed-download'
+EIQVERSION = '/private'
+EIQUSER = '<eiq-user>'
+EIQPASS = '<eiq-password>'
+EIQSOURCE = '<eiq-automation-source>'
+EIQSSLVERIFY = True
+
+# ORG                   [Required] Choose an organisation name to add to every indciator
+# TAG                   [Required] Choose a prefix/header that will be added to every
+#                                  MSSC Indicator for easy searches/recognition, and
+#                                  to fill the recommendedActions field.
+
+ORG = 'MyCERT'
+TAG = '%s EclecticIQ Intelligence' % (ORG)
