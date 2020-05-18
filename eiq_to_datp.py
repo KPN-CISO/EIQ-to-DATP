@@ -75,8 +75,8 @@ def transform(feedJSON, feedID, options):
                                             if classification == 'bad':
                                                 confidence = meta['confidence']
                                                 entry[title]['confidence'] = confidence
-                                        if kind in entry[title]:
-                                            entry[title][kind].append(value)
+                                                if kind in entry[title]:
+                                                    entry[title][kind].append(value)
                     entities.append(entry)
     return(entities)
 
@@ -240,7 +240,7 @@ def download(feedID, options):
                                   method='GET')
     except IOError:
         print("E) An error occurred contacting the EIQ URL at " +
-              eiqFeed)
+              eiqHost + eiqFeed)
         raise
     if not response or ('errors' in response):
         if response:
@@ -264,13 +264,12 @@ def download(feedID, options):
                                       method='GET')
             if options.verbose:
                 pprint.pprint(response)
+            return response['entities']
         except IndexError:
             if 'entities' not in response:
                 if options.verbose:
                     print("E) No entities in response!")
                     pprint.pprint(response)
-            else:
-                return response['entities']
 
 
 
