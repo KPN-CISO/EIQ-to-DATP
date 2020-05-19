@@ -40,6 +40,9 @@ def deleteIndicator(options, id, MSSCTOKEN):
     if not options.simulate:
         try:
             r = requests.delete(url, headers=apiheaders)
+            if options.verbose:
+                print("U) Got a JSON response:")
+                print(r)
         except IOError:
             if options.verbose:
                 print("E) An error occured deleting the indicator!")
@@ -88,29 +91,29 @@ def download(options, MSSCTOKEN):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Delete Custom Indicator from MSSC')
+    parser = argparse.ArgumentParser(description='Delete Indicator from MSSC')
     parser.add_argument('-v', '--verbose',
                         dest='verbose',
                         action='store_true',
                         default=False,
-                        help='[optional] Enable progress/error info (default: disabled)')
+                        help='[optional] Enable verbosity (default: disabled)')
     parser.add_argument('-s', '--simulate',
                         dest='simulate',
                         action='store_true',
                         default=False,
                         help='[optional] Do not actually ingest anything into '
-                             'EIQ, just simulate everything. Mostly useful with '
-                             'the -v/--verbose flag.')
+                             'EIQ, just simulate everything. Mostly useful '
+                             'with the -v/--verbose flag.')
     parser.add_argument('-i', '--indicator(s)',
                         dest='indicators',
                         default=None,
                         required=False,
                         nargs='*',
-                        help='[required] A list of indicators to delete, e.g. '
-                             'a SHA1 hash: 3395856ce81f2b7382dee72602f798b642f14140. '
-                             'If you do not specify an indicator, this script will '
-                             'print an overview of all current Custom Indicators in '
-                             'verbose mode.')
+                        help='[required] List of indicators to delete, e.g. a '
+                             'SHA1 hash: 3395856ce81f2b7382dee72602f798b642f1'
+                             '4140. If you do not specify an indicator, this '
+                             'script will print an overview of all current '
+                             'Custom Indicators if verbose mode is enabled.')
     args = parser.parse_args()
     MSSCTOKEN = graph.generateMSSCToken(args, settings)
     customIndicators = download(args, MSSCTOKEN)
@@ -120,7 +123,8 @@ def main():
                 customIndicatorType = str(customIndicator['indicatorType'])
                 customIndicatorValue = str(customIndicator['indicatorValue'])
                 if args.verbose:
-                    print('Type:', customIndicatorType, '- Value:', customIndicatorValue)
+                    print('Type:', customIndicatorType, '- Value:',
+                          customIndicatorValue)
         else:
             for customIndicator in customIndicators:
                 customIndicatorValue = str(customIndicator['indicatorValue'])
@@ -128,6 +132,7 @@ def main():
                     if customIndicator['indicatorValue'] == indicator:
                         indicatorId = customIndicator['id']
                         deleteIndicator(args, indicatorId, MSSCTOKEN)
+
 
 if __name__ == "__main__":
     main()

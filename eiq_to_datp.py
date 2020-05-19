@@ -11,10 +11,10 @@ import datetime
 import json
 import pprint
 import ssl
+import sys
 import time
 import urllib
 
-from eiqlib import eiqjson
 from eiqlib import eiqcalls
 from graphlib import graph
 from config import settings
@@ -71,12 +71,15 @@ def transform(feedJSON, feedID, options):
                                     if 'meta' in extract:
                                         meta = extract['meta']
                                         if 'classification' in meta:
-                                            classification = meta['classification']
+                                            classification =\
+                                                meta['classification']
                                             if classification == 'bad':
                                                 confidence = meta['confidence']
-                                                entry[title]['confidence'] = confidence
+                                                entry[title]['confidence'] =\
+                                                    confidence
                                                 if kind in entry[title]:
-                                                    entry[title][kind].append(value)
+                                                    entry[title][kind].\
+                                                        append(value)
                     entities.append(entry)
     return(entities)
 
@@ -85,7 +88,8 @@ def createIndicators(entities, options):
     jsonIndicators = list()
     timeNow = int(datetime.datetime.now(tz=datetime.timezone.utc).timestamp())
     expirySeconds = timeNow + (settings.EXPIRY * 86400)
-    expiryTime = str(datetime.datetime.utcfromtimestamp(expirySeconds).strftime("%Y-%m-%dT%H:%M:%SZ"))
+    expiryTime = str(datetime.datetime.utcfromtimestamp(expirySeconds).
+                     strftime("%Y-%m-%dT%H:%M:%SZ"))
     if options.verbose:
         print("U) Creating Indicators ...")
     if options.type == 'b':
@@ -115,7 +119,8 @@ def createIndicators(entities, options):
                     jsonIndicator['expirationTime'] = expiryTime
                     jsonIndicator['action'] = action
                     jsonIndicator['severity'] = severity
-                    jsonIndicator['recommendedActions'] = 'Report to ' + settings.ORG
+                    jsonIndicator['recommendedActions'] = 'Report to '
+                    jsonIndicator['recommendedActions'] += settings.ORG
                     jsonIndicators.append(jsonIndicator)
             if observables['hash-sha1']:
                 for sha1 in observables['hash-sha1']:
@@ -128,7 +133,8 @@ def createIndicators(entities, options):
                     jsonIndicator['expirationTime'] = expiryTime
                     jsonIndicator['action'] = action
                     jsonIndicator['severity'] = severity
-                    jsonIndicator['recommendedActions'] = 'Report to ' + settings.ORG
+                    jsonIndicator['recommendedActions'] = 'Report to '
+                    jsonIndicator['recommendedActions'] += settings.ORG
                     jsonIndicators.append(jsonIndicator)
             if observables['hash-sha256']:
                 for sha256 in observables['hash-sha256']:
@@ -141,7 +147,8 @@ def createIndicators(entities, options):
                     jsonIndicator['expirationTime'] = expiryTime
                     jsonIndicator['action'] = action
                     jsonIndicator['severity'] = severity
-                    jsonIndicator['recommendedActions'] = 'Report to ' + settings.ORG
+                    jsonIndicator['recommendedActions'] = 'Report to '
+                    jsonIndicator['recommendedActions'] += settings.ORG
                     jsonIndicators.append(jsonIndicator)
             if observables['ipv4']:
                 for ipv4 in observables['ipv4']:
@@ -154,7 +161,8 @@ def createIndicators(entities, options):
                     jsonIndicator['expirationTime'] = expiryTime
                     jsonIndicator['action'] = action
                     jsonIndicator['severity'] = severity
-                    jsonIndicator['recommendedActions'] = 'Report to ' + settings.ORG
+                    jsonIndicator['recommendedActions'] = 'Report to '
+                    jsonIndicator['recommendedActions'] += settings.ORG
                     jsonIndicators.append(jsonIndicator)
             if observables['ipv6']:
                 for ipv6 in observables['ipv6']:
@@ -167,7 +175,8 @@ def createIndicators(entities, options):
                     jsonIndicator['expirationTime'] = expiryTime
                     jsonIndicator['action'] = action
                     jsonIndicator['severity'] = severity
-                    jsonIndicator['recommendedActions'] = 'Report to ' + settings.ORG
+                    jsonIndicator['recommendedActions'] = 'Report to '
+                    jsonIndicator['recommendedActions'] += settings.ORG
                     jsonIndicators.append(jsonIndicator)
             if observables['uri']:
                 for uri in observables['uri']:
@@ -180,8 +189,9 @@ def createIndicators(entities, options):
                     jsonIndicator['expirationTime'] = expiryTime
                     jsonIndicator['action'] = action
                     jsonIndicator['severity'] = severity
-                    jsonIndicator['recommendedActions'] = 'Report to ' + settings.ORG
-                    #jsonIndicators.append(jsonIndicator)
+                    jsonIndicator['recommendedActions'] = 'Report to '
+                    jsonIndicator['recommendedActions'] += settings.ORG
+                    # jsonIndicators.append(jsonIndicator)
     return(jsonIndicators)
 
 
@@ -208,9 +218,13 @@ def ingest(indicators, MSSCTOKEN, options):
         if options.verbose:
             print("Added Indicator:", jsondataasbytes)
         if options.simulate:
-            print("U) Not ingesting anything into MSSC because simulate mode set!")
+            print("U) Not ingesting anything because simulate mode set!")
         else:
-            response = urllib.request.urlopen(request, data=jsondataasbytes, context=sslcontext)
+            response = urllib.request.urlopen(request, data=jsondataasbytes,
+                                              context=sslcontext)
+            if options.verbose:
+                print("U) Got a JSON Response:")
+                print(response)
             time.sleep(0.6)
         if options.verbose:
             print("Slept a bit to not overload the API ...")
@@ -272,38 +286,39 @@ def download(feedID, options):
                     pprint.pprint(response)
 
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='EIQ to DATP converter')
     parser.add_argument('-v', '--verbose',
-                   dest='verbose',
-                   action='store_true',
-                   default=False,
-                   help='[optional] Enable progress/error info (default: ' +
-                        'disabled)')
+                        dest='verbose',
+                        action='store_true',
+                        default=False,
+                        help='[optional] Enable progress/error info ' +
+                             '(default: disabled)')
     parser.add_argument('-t', '--type',
-                   dest='type',
-                   default='b',
-                   help='[optional] Set the type of action rule you ' +
-                        'wish to create: [a]lert, [b]lock or [p]ermit ('+
-                        'default: block, which will also alert)')
+                        dest='type',
+                        default='b',
+                        help='[optional] Set the type of action rule you ' +
+                             'wish to create: [a]lert, [b]lock or [p]ermit ' +
+                             '(default: block, which will also alert)')
     parser.add_argument('-s', '--simulate',
-                   dest='simulate',
-                   action='store_true',
-                   default=False,
-                   help='[optional] Do not actually generate anything, ' +
-                        'just simulate everything. Mostly useful with ' +
-                        'the -v/--verbose flag for debugging purposes.')
+                        dest='simulate',
+                        action='store_true',
+                        default=False,
+                        help='[optional] Do not actually generate anything, ' +
+                             'just simulate everything. Mostly useful with ' +
+                             'the -v/--verbose flag for debugging purposes.')
     parser.add_argument('-m', '--maliciousness',
-                   dest='maliciousness',
-                   default=None,
-                   help='[optional] Override the default severity from the ' +
-                        'EIQ indicators: [i]nfo, [l]ow, [m]edium or [h]igh')
+                        dest='maliciousness',
+                        default=None,
+                        help='[optional] Override the default severity from ' +
+                             'the EIQ indicators: [i]nfo, [l]ow, [m]edium ' +
+                             '[h]igh')
     parser.add_argument('-f', '--feedID',
-                   dest='feedID',
-                   required=True,
-                   default=None,
-                   help='[required] The ID of the EclecticIQ feed to ingest')
+                        dest='feedID',
+                        required=True,
+                        default=None,
+                        help='[required] The ID of the EclecticIQ feed to ' +
+                             'ingest')
     options = parser.parse_args()
     try:
         feedID = int(options.feedID)
