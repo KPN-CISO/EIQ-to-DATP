@@ -23,11 +23,11 @@ For EIQ-to-DATP usage:
 - Clone the repository
 - Rename the `settings.py.sample` file in the `config` directory to `settings.py` 
 - Edit the settings in the `settings.py` file to reflect your environment
-- Run ./eiq_to_datp.py -h for help/options
+- Run `./eiq_to_datp.py -h` for help/options
 
 To delete indicators from MDATP:
 
-The ./delete_indicator.py script will let you remove an indicator through the use of the '-i [indicator1] [indicator2] ... [indicatorN]' command-line option. You do not need to know the actual indicator IDs: it is sufficient to simply list the indicator itself, e.g.: './delete_indicator.py -i 192.168.0.1'.
+The `delete_indicator.py` script will let you remove an indicator through the use of the `-i [indicator1] [indicator2] ... [indicatorN]` command-line option. You do not need to know the actual indicator IDs: it is sufficient to simply list the indicator itself, e.g.: `./delete_indicator.py -i 192.168.0.1`.
 
 # Options
 
