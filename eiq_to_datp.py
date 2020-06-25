@@ -102,9 +102,10 @@ def createIndicators(entities, options):
         for title in entity:
             observables = entity[title]
             description = title
-            if observables['confidence']:
-                confidence = observables['confidence']
-                severity = confidence.capitalize()
+            if 'confidence' in observables:
+                if observables['confidence']:
+                    confidence = observables['confidence']
+                    severity = confidence.capitalize()
             else:
                 severity = 'Informational'
             application = settings.TAG
