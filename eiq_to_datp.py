@@ -32,8 +32,6 @@ def transform(feedJSON, feedID, options):
         if 'extracts' in entity:
             if 'description' in entity['data']:
                 description = entity['data']['description']
-            else:
-                description = ''
             if 'meta' in entity:
                 meta = entity['meta']
                 tlp = 'AMBER'
@@ -229,7 +227,7 @@ def ingest(indicators, MSSCTOKEN, options):
                 if options.verbose:
                     print("U) Got a JSON Response:")
                     print(response)
-                time.sleep(0.8)
+                time.sleep(0.6)
                 if options.verbose:
                     print("Slept a bit to not overload the API ...")
             except urllib.error.HTTPError as error:
