@@ -32,6 +32,8 @@ def transform(feedJSON, feedID, options):
         if 'extracts' in entity:
             if 'description' in entity['data']:
                 description = entity['data']['description']
+            else:
+                description = ''
             if 'meta' in entity:
                 meta = entity['meta']
                 tlp = 'AMBER'
@@ -192,7 +194,7 @@ def createIndicators(entities, options):
                     jsonIndicator['severity'] = severity
                     jsonIndicator['recommendedActions'] = 'Report to '
                     jsonIndicator['recommendedActions'] += settings.ORG
-                    # jsonIndicators.append(jsonIndicator)
+                    jsonIndicators.append(jsonIndicator)
     return(jsonIndicators)
 
 
@@ -207,7 +209,7 @@ def ingest(indicators, MSSCTOKEN, options):
         sslcontext.check_hostname = False
         sslcontext.verify_mode = ssl.CERT_NONE
     for indicator in indicators:
-        uri = settings.MSSCAPIURL
+        uri = settings.MSSCURL
         headers = {
             'Authorization': 'Bearer %s' % MSSCTOKEN,
             'Content-Type': 'application/json',
@@ -221,15 +223,23 @@ def ingest(indicators, MSSCTOKEN, options):
         if options.simulate:
             print("U) Not ingesting anything because simulate mode set!")
         else:
-            response = urllib.request.urlopen(request, data=jsondataasbytes,
-                                              context=sslcontext)
-            if options.verbose:
-                print("U) Got a JSON Response:")
-                print(response)
-            time.sleep(0.6)
-        if options.verbose:
-            print("Slept a bit to not overload the API ...")
-
+            try:
+                response = urllib.request.urlopen(request, data=jsondataasbytes,
+                                                  context=sslcontext)
+                if options.verbose:
+                    print("U) Got a JSON Response:")
+                    print(response)
+                time.sleep(0.8)
+                if options.verbose:
+                    print("Slept a bit to not overload the API ...")
+            except urllib.error.HTTPError as error:
+                print("E) Got an error during ingestion!")
+                print("E) Headers:")
+                print(request)
+                print("E) JSON:")
+                print(jsondataasbytes)
+                print("E) Error:")
+                print(error)
 
 def download(feedID, options):
     '''
