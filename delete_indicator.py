@@ -131,6 +131,7 @@ def main():
                 for indicator in args.indicators:
                     if customIndicator['indicatorValue'] == indicator:
                         indicatorId = customIndicator['id']
+                        print('Deleting: ' + indicator)
                         deleteIndicator(args, indicatorId, MSSCTOKEN)
 
 
